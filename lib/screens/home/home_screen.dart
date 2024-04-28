@@ -1,9 +1,10 @@
 import 'package:chat_app_solid/data/repositories/chat_repository.dart';
+import 'package:chat_app_solid/screens/home/chat_screen.dart';
 import 'package:chat_app_solid/utils/images/app_images.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 import '../../data/models/contact_model.dart';
 import '../../utils/size/app_size.dart';
@@ -44,18 +45,17 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: (){},
+                      onTap: () {},
                       child: Container(
                         margin: EdgeInsets.only(right: 16.w),
                         height: 56.h,
                         width: 56.h,
                         decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Colors.grey, width: 2.w),
+                          border: Border.all(color: Colors.grey, width: 2.w),
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child:
-                            Icon(Icons.add, color: Colors.grey.withOpacity(0.6)),
+                        child: Icon(Icons.add,
+                            color: Colors.grey.withOpacity(0.6)),
                       ),
                     ),
                     4.getH(),
@@ -76,7 +76,7 @@ class HomeScreen extends StatelessWidget {
                     return Column(
                       children: [
                         GestureDetector(
-                          onTap: (){},
+                          onTap: () {},
                           child: Container(
                             height: 56.h,
                             width: 56.h,
@@ -127,16 +127,77 @@ class HomeScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView(
+              physics: const BouncingScrollPhysics(),
               children: [
                 ...List.generate(
                   context.read<ChatRepository>().allContacts.length,
-                      (index) {
+                  (index) {
                     ContactModel contacts =
-                    context.read<ChatRepository>().allContacts[index];
+                        context.read<ChatRepository>().allContacts[index];
                     return Container(
-                      margin: ,
-                      child: ListTile(A
-                        leading: Image.network(contacts.imageUrl),
+                      height: 48.h,
+                      width: 48.h,
+                      margin: EdgeInsets.symmetric(
+                          horizontal: 10.w, vertical: 10.h),
+                      child: ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                contactName: contacts.contactFirstName,
+                                contactId: contacts.contactId,
+                              ),
+                            ),
+                          );
+                        },
+                        leading: Stack(children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: SizedBox(
+                              height: 48.h,
+                              width: 48.h,
+                              child: Image.network(
+                                contacts.imageUrl,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          Visibility(
+                            visible: contacts.isOnline,
+                            child: Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                height: 13.h,
+                                width: 13.h,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.greenAccent,
+                                    border: Border.all(
+                                        color: Colors.white, width: 1.h)),
+                              ),
+                            ),
+                          )
+                        ]),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              contacts.contactFirstName,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              DateFormat.jm().format(contacts.lastOnlineTime),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Text(contacts.contactId.toString()),
                       ),
                     );
                   },
